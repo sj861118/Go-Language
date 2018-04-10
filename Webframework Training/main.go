@@ -2,9 +2,13 @@ package main
 
 import(
   "fmt"
+  "time"
 )
 
-
+type User struct{
+  Id string
+  AddressId string
+}
 
 func main(){
   s := NewServer()
@@ -13,6 +17,19 @@ func main(){
     fmt.Fprintln(c.ResponseWriter, "welcome")
   })
 
+  s.HandleFunc("GET", "/users/:id", func(c *Context){
+    u := User{Id:c.Params["id"].(string)}
+    c.RenderXml(u)
+  })
+
+  s.HandleFunc("GET", "/users/:user_id/addresses/:address_id", func(c *Context){
+    u := User{Id:c.Params["user_id"].(string), AddressId:c.Params["address_id"].(string)}
+    c.RenderJson(u)
+  })
+
+  s.HandleFunc("GET", "/", func(c *Context){
+    c.RenderTemplate("/public/index.html", map[string]interface{}{"time": time.Now()})
+  })
   s.Run(":9000")
 /*
   r := &router{make(map[string]map[string]HandlerFunc)}
